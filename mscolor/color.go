@@ -41,6 +41,52 @@ func FromAHSV(a uint8, h int, s float64, v float64) *Color {
 
 // MakeRGB makes red, green, blue member
 func (c *Color) MakeRGB() *Color {
+	// 彩度がないときはすべて同値になる
+	if c.S == 0 {
+		v := uint8(round(c.V * 255))
+		c.R = v
+		c.G = v
+		c.B = v
+		return c
+	}
+
+	H := float64(c.H)
+	S := c.S
+
+	Hi := math.Floor(H / 60)
+	F := (H / 60.0) - Hi
+	M := uint8(round((c.V * (1.0 - S)) * 255.0))
+	N := uint8(round((c.V * (1.0 - (S * F))) * 255.0))
+	K := uint8(round((c.V * (1.0 - (S * (1 - F)))) * 255.0))
+	V := uint8(round(c.V * 255.0))
+
+	switch {
+	case Hi == 0:
+		c.R = V
+		c.G = K
+		c.B = M
+	case Hi == 1:
+		c.R = N
+		c.G = V
+		c.B = M
+	case Hi == 2:
+		c.R = M
+		c.G = V
+		c.B = K
+	case Hi == 3:
+		c.R = M
+		c.G = N
+		c.B = V
+	case Hi == 4:
+		c.R = K
+		c.G = M
+		c.B = V
+	case Hi == 5:
+		c.R = V
+		c.G = M
+		c.B = N
+	}
+
 	return c
 }
 
